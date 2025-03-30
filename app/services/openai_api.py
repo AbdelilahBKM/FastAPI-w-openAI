@@ -1,6 +1,7 @@
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+load_dotenv()
 
 ASP_NET_API = os.getenv("ASPNET_API_URL")
 OPENAI_API_KEY = os.getenv("GITHUB_TOKEN")

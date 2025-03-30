@@ -2,19 +2,15 @@ from fastapi import HTTPException
 import httpx
 from typing import List
 from app.utils.functions import generate_user
-from app.CRUD.user_crud import add_user_to_db
+from app.CRUD.user_crud import add_user_to_db, get_all_local_users
 from dotenv import load_dotenv
 import os
 load_dotenv()
 DOT_NET_API = os.getenv("ASPNET_API_URL")
 
-async def get_users_asp() -> List[dict]:
+async def get_local_users(db) -> List[dict]:
     async with httpx.AsyncClient as client:
-        response = await client.get(f"{DOT_NET_API}/UserIdentity")
-        if response.status_code == 200:
-            return response.json()
-        raise HTTPException(status_code=response.status_code, detail=response.text)
-
+        return await get_all_local_users(db)
 
 async def generate_new_users(nbr_users: int, db) -> List[dict]:
     list_users = generate_user(nbr_users)
