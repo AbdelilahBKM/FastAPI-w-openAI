@@ -28,9 +28,20 @@ async def create_discussions_asp(discussions: List[Discussion], db) -> List[Disc
                                          json=discussion,
                                          headers={"Authorization": f"Bearer {random_user.token}"})
             if response.status_code == 200:
-                discussion["id"] = response.json().get("id")
+                discussion.id= response.json().get("id")
                 create_discussion_to_db(discussion, db)
                 list_discussions.append(discussion)
             else:
                 raise HTTPException(status_code=response.status_code, detail=response.text)
     return list_discussions
+
+async def get_all_discussions_asp(db) -> List[Discussion]:
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"{DOT_NET_API}/Discussion")
+        if response.status_code == 200:
+            discussions = response.json()
+            for discussion in discussions:
+                discussion["id"] = discussion.pop("id")
+                create_discussion_to_db(discussion, db)
+            return discussions
+        raise HTTPException(status_code=response.status_code, detail=response.text)

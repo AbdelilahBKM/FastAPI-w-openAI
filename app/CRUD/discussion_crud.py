@@ -1,12 +1,9 @@
 from app.models import Discussion
 from sqlalchemy import Session
 
-def create_discussion_to_db(discussion_data: dict, db: Session) -> None:
-    db_discussion = Discussion(
-        d_Name=discussion_data["d_Name"],
-        d_Profile=discussion_data["d_Profile"],
-        d_Description=discussion_data["d_Description"],
-        OwnerId=discussion_data["OwnerId"]
-    )
+def create_discussion_to_db(db_discussion, db: Session) -> None:
     db.add(db_discussion)
     db.commit()
+
+def get_local_discussions(db: Session) -> list:
+    return db.query(Discussion).all()
