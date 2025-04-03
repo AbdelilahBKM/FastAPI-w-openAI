@@ -28,3 +28,6 @@ async def get_random_user(db: Session) -> User:
 async def get_random_users(db: Session, count: int) -> list:
     users = await db.query(User).all()
     return random.sample(users, count) if len(users) >= count else users
+
+async def get_user_by_id(db: Session, user_id: str) -> User:
+    return await db.query(User).filter(User.id == user_id).first()

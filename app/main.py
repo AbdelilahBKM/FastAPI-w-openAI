@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends
 from dotenv import load_dotenv
+from fastapi import Request
 
 from app.CRUD.discussion_crud import get_local_discussions
 from app.CRUD.joining_crud import get_all_joining, get_all_joining_by_discussion_id, get_all_joining_by_user_id
@@ -24,6 +25,15 @@ async def root():
 async def pingOpenAI():
     try:
         response = generate_gpt_response("ping")
+        return {"message": response}
+    except Exception as ex:
+        return {"error": str(ex)}
+
+@app.post("/OpenAI/request")
+async def create_openai_request(request: Request):
+    try:
+        body = await request.json()
+        response = generate_gpt_response(body["prompt"])
         return {"message": response}
     except Exception as ex:
         return {"error": str(ex)}
@@ -70,9 +80,10 @@ async def generate_discussions(db: Session = Depends(SessionLocal)):
         return {"error": str(ex)}
 
 @app.post("/Discussions/new")
-async def create_discussion(discussion, db: Session = Depends(SessionLocal)):
+async def create_discussion(request: Request, db: Session = Depends(SessionLocal)):
     try:
-        discussion = await create_discussion_asp(discussion, db)
+        body = await request.json()
+        discussion = await create_discussion_asp(body["discussion"], db)
         return {"discussion": discussion}
     except Exception as ex:
         return {"error": str(ex)}
