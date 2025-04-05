@@ -1,5 +1,5 @@
 from app.models import Discussion
-from sqlalchemy import Session
+from sqlalchemy.orm import Session
 
 def create_discussion_to_db(db_discussion, db: Session) -> None:
     db.add(db_discussion)

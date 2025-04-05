@@ -1,5 +1,5 @@
 from app.models import Post
-from sqlalchemy import Session
+from sqlalchemy.orm import Session
 
 def create_question_to_db(question_data: dict, db: Session) -> Post:
     db_question = Post(

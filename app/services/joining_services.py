@@ -4,7 +4,7 @@ import httpx
 import os
 import random
 from dotenv import load_dotenv
-from app.models import User, Discussion, Joining
+from app.models import Discussion, Joining
 from app.CRUD.joining_crud import create_joining_to_db
 from app.CRUD.user_crud import get_random_users
 from app.CRUD.discussion_crud import get_local_discussions
@@ -13,7 +13,7 @@ load_dotenv()
 DOT_NET_API = os.getenv("ASPNET_API_URL")
 
 async def create_multiple_joining_to_discussion(discussions: Discussion, db) -> List[Joining] | None:
-    users = await get_random_users(db, random.randint(7, 25))
+    users = get_random_users(db, random.randint(7, 25))
     joinings: List[Joining] = []
     for user in users:
         async with httpx.AsyncClient() as client:

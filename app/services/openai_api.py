@@ -1,8 +1,6 @@
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
-import asyncio
-from app.models import Post
 
 load_dotenv()
 

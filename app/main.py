@@ -24,7 +24,7 @@ async def root():
     return {"message": "Hello World"}
 
 @app.get("/pingOpenAI")
-async def pingOpenAI():
+async def ping_openai():
     try:
         response = generate_gpt_response("ping")
         return {"message": response}
@@ -60,16 +60,16 @@ async def get_users(db: Session = Depends(SessionLocal)):
 @app.get("/Discussions/local")
 async def get_discussions(db: Session = Depends(SessionLocal)):
     try:
-        discussions = get_local_discussions(db)
-        return {"discussions": discussions}
+        local_discussions = get_local_discussions(db)
+        return {"discussions": local_discussions}
     except Exception as ex:
         return {"error": str(ex)}
 
 @app.get("/Discussions/asp")
 async def get_discussions_asp(db: Session = Depends(SessionLocal)):
     try:
-        discussions = await get_all_discussions_asp(db)
-        return {"discussions": discussions}
+        external_discussions = await get_all_discussions_asp(db)
+        return {"discussions": external_discussions}
     except Exception as ex:
         return {"error": str(ex)}
 
@@ -99,7 +99,7 @@ async def get_joining(db: Session = Depends(SessionLocal)):
         return {"error": str(ex)}
 
 @app.get("/Joining/discussion/{discussion_id}")
-async def get_joining_by_discussion(discussion_id: str, db: Session = Depends(SessionLocal)):
+async def get_joining_by_discussion(discussion_id: int, db: Session = Depends(SessionLocal)):
     try:
         joining = get_all_joining_by_discussion_id(discussion_id, db)
         return {"joining": joining}

@@ -19,7 +19,7 @@ async def populate_discussion_with_posts(discussion_id: int, db) -> list[Post] |
         raise ValueError("Discussion not found")
     for i in range(random.randint(5, 20)):
         print("Creating post number", i + 1)
-        owner = await get_random_user_by_discussion_id(discussion_id, db)
+        owner = get_random_user_by_discussion_id(discussion_id, db)
         if owner is None:
             raise ValueError("No user found for the discussion")
         question = await generate_discussion_question(discussion.d_Name)
@@ -57,7 +57,7 @@ async def populate_discussion_with_answers(discussion_id: int, db) -> None:
     for question in questions:
         for i in range(random.randint(2, 10)):
             print("Creating post number", i + 1)
-            owner = await get_random_user_by_discussion_id(discussion_id, db)
+            owner = get_random_user_by_discussion_id(discussion_id, db)
             if owner is None:
                 raise ValueError("No user found for the discussion")
             answer = await generate_answer_to_question({

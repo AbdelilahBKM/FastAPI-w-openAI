@@ -11,7 +11,7 @@ DOT_NET_API = os.getenv("ASPNET_API_URL")
 
 async def create_discussion_asp(discussion: dict, db) -> dict:
     async with httpx.AsyncClient as client:
-        response = await client.post(f"{DOT_NET_API}/Discussion", json=discussion)
+        response = await client.post(f"{DOT_NET_API}/Discussion", data=discussion)
         if response.status_code == 200:
             discussion["id"] = response.json().get("id")
             create_discussion_to_db(discussion, db)
@@ -22,7 +22,7 @@ async def create_discussions_asp(discussions: List[Discussion], db) -> List[Disc
     list_discussions = []
     for discussion in discussions:
         async with httpx.AsyncClient() as client:
-            random_user = await get_random_user(db)
+            random_user = get_random_user(db)
             discussion.OwnerId = random_user.id
             response = await client.post(f"{DOT_NET_API}/Discussion",
                                          json=discussion,
