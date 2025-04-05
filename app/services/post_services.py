@@ -1,5 +1,6 @@
 import httpx
 import os
+import random
 from dotenv import load_dotenv
 from app.CRUD.joining_crud import get_random_user_by_discussion_id
 from app.CRUD.post_crud import create_question_to_db, get_questions_by_discussion_id, create_answer_to_db
@@ -11,12 +12,12 @@ load_dotenv()
 DOT_NET_API = os.getenv("ASPNET_API_URL")
 
 
-async def populate_discussion_with_posts(discussion_id: int, nbr_posts: int, db) -> list[Post] | None:
+async def populate_discussion_with_posts(discussion_id: int, db) -> list[Post] | None:
     discussion = get_discussion_by_id(discussion_id, db)
     questions = []
     if discussion is None:
         raise ValueError("Discussion not found")
-    for i in range(nbr_posts):
+    for i in range(random.randint(5, 20)):
         print("Creating post number", i + 1)
         owner = await get_random_user_by_discussion_id(discussion_id, db)
         if owner is None:
@@ -47,14 +48,14 @@ async def populate_discussion_with_posts(discussion_id: int, nbr_posts: int, db)
                 raise ValueError(f"Failed to create question: {response.text}")
         return questions
 
-async def populate_discussion_with_answers(discussion_id: int, average_answers_per_post: int, db) -> None:
+async def populate_discussion_with_answers(discussion_id: int, db) -> None:
     discussion = get_discussion_by_id(discussion_id, db)
     answers = []
     if discussion is None:
         raise ValueError("Discussion not found")
     questions = get_questions_by_discussion_id(discussion_id=discussion_id, db=db)
     for question in questions:
-        for i in range(average_answers_per_post):
+        for i in range(random.randint(2, 10)):
             print("Creating post number", i + 1)
             owner = await get_random_user_by_discussion_id(discussion_id, db)
             if owner is None:

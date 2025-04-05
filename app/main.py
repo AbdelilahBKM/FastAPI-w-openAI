@@ -8,6 +8,7 @@ from app.database import SessionLocal
 from sqlalchemy.orm import Session
 
 from app.services.discussion_services import get_all_discussions_asp, create_discussions_asp
+from app.services.joining_services import create_joining_to_discussions
 from app.services.openai_api import generate_gpt_response
 from app.services.user_services import generate_new_users, get_local_users
 from app.services.discussion_services import create_discussion_asp
@@ -113,18 +114,26 @@ async def get_joining_by_user(user_id: str, db: Session = Depends(SessionLocal))
     except Exception as ex:
         return {"error": str(ex)}
 
-@app.post("/Post/{discussion_id}/{nbr_posts}")
-async def create_questions_to_discussions(discussion_id: int, nbr_posts: int, db: Session = Depends(SessionLocal)):
+@app.post("/Joining/generate")
+async def generate_joining(db: Session = Depends(SessionLocal)):
     try:
-        questions = await populate_discussion_with_posts(discussion_id, nbr_posts, db)
+        await create_joining_to_discussions(db)
+        return {"message": "Joining created successfully"}
+    except Exception as ex:
+        return {"error": str(ex)}
+
+@app.post("/Post/{discussion_id}/{nbr_posts}")
+async def create_questions_to_discussions(discussion_id: int, db: Session = Depends(SessionLocal)):
+    try:
+        questions = await populate_discussion_with_posts(discussion_id, db)
         return {"questions": questions}
     except Exception as ex:
         return {"error": str(ex)}
 
-@app.post("/Post/answers/{discussion_id}/{average_answers_per_post}")
-async def create_answers_to_discussions(discussion_id: int, average_answers_per_post: int, db: Session = Depends(SessionLocal)):
+@app.post("/Post/answers/{discussion_id}")
+async def create_answers_to_discussions(discussion_id: int, db: Session = Depends(SessionLocal)):
     try:
-        answers = await populate_discussion_with_answers(discussion_id, average_answers_per_post, db)
+        answers = await populate_discussion_with_answers(discussion_id, db)
         return {"answers": answers}
     except Exception as ex:
         return {"error": str(ex)}
