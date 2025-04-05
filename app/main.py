@@ -11,6 +11,7 @@ from app.services.discussion_services import get_all_discussions_asp, create_dis
 from app.services.openai_api import generate_gpt_response
 from app.services.user_services import generate_new_users, get_local_users
 from app.services.discussion_services import create_discussion_asp
+from app.services.post_services import populate_discussion_with_posts, populate_discussion_with_answers
 from app.utils.functions import discussions
 
 
@@ -109,5 +110,21 @@ async def get_joining_by_user(user_id: str, db: Session = Depends(SessionLocal))
     try:
         joining = get_all_joining_by_user_id(user_id, db)
         return {"joining": joining}
+    except Exception as ex:
+        return {"error": str(ex)}
+
+@app.post("/Post/{discussion_id}/{nbr_posts}")
+async def create_questions_to_discussions(discussion_id: int, nbr_posts: int, db: Session = Depends(SessionLocal)):
+    try:
+        questions = await populate_discussion_with_posts(discussion_id, nbr_posts, db)
+        return {"questions": questions}
+    except Exception as ex:
+        return {"error": str(ex)}
+
+@app.post("/Post/answers/{discussion_id}/{average_answers_per_post}")
+async def create_answers_to_discussions(discussion_id: int, average_answers_per_post: int, db: Session = Depends(SessionLocal)):
+    try:
+        answers = await populate_discussion_with_answers(discussion_id, average_answers_per_post, db)
+        return {"answers": answers}
     except Exception as ex:
         return {"error": str(ex)}
