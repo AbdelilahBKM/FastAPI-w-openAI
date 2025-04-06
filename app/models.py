@@ -1,17 +1,17 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from app.database import Base
 
 
 class User(Base):
     __tablename__ = 'users'
-    id = Column(String, primary_key=True, index=True)
-    userName = Column(String, index=True)
-    firstName = Column(String, index=True)
-    lastName = Column(String, index=True)
-    email = Column(String, unique=True, index=True)
-    password = Column(String, index=True)
-    token = Column(String)
+    id = Column(String(100), primary_key=True, index=True)
+    userName = Column(String(100), index=True)
+    firstName = Column(String(100), index=True)
+    lastName = Column(String(100), index=True)
+    email = Column(String(100), unique=True, index=True)
+    password = Column(String(100), index=True)
+    token = Column(Text)
 
     # Relationships
     discussions = relationship("Discussion", back_populates="owner")
@@ -23,10 +23,10 @@ class User(Base):
 class Discussion(Base):
     __tablename__ = 'discussions'
     id = Column(Integer, primary_key=True, index=True)
-    d_Name = Column(String, index=True)
-    d_Profile = Column(String, index=True)
-    d_Description = Column(String, index=True, default="description")
-    OwnerId = Column(String, ForeignKey('users.id'), index=True)  # Corrected foreign key
+    d_Name = Column(String(100), index=True)
+    d_Profile = Column(String(255), index=True)
+    d_Description = Column(String(255), index=True, default="description")
+    OwnerId = Column(String(100), ForeignKey('users.id'), index=True)  # Corrected foreign key
     # Relationships
     owner = relationship("User", back_populates="discussions")
     joinings = relationship("Joining", back_populates="discussion")
@@ -36,7 +36,7 @@ class Discussion(Base):
 class Joining(Base):
     __tablename__ = 'joinings'
     id = Column(Integer, primary_key=True, index=True)
-    userId = Column(String, ForeignKey('users.id'), index=True)  # Corrected
+    userId = Column(String(100), ForeignKey('users.id'), index=True)  # Corrected
     discussionId = Column(Integer, ForeignKey('discussions.id'), index=True)  # Corrected
 
     # Relationships
@@ -47,9 +47,9 @@ class Joining(Base):
 class Post(Base):
     __tablename__ = 'posts'
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    content = Column(String, index=True)
-    postedBy = Column(String, ForeignKey('users.id'), index=True)  # Corrected
+    title = Column(String(100), index=True)
+    content = Column(Text)
+    postedBy = Column(String(100), ForeignKey('users.id'), index=True)  # Corrected
     questionId = Column(Integer, ForeignKey('posts.id'), nullable=True)  # Changed from 'questions.id'
     discussionId = Column(Integer, ForeignKey('discussions.id'), nullable=True)  # Corrected
     postType = Column(Integer, index=True)  # 0 for question, 1 for answer
@@ -64,7 +64,7 @@ class Post(Base):
 class Vote(Base):
     __tablename__ = 'votes'
     id = Column(Integer, primary_key=True, index=True)
-    userId = Column(String, ForeignKey('users.id'), index=True)  # Corrected
+    userId = Column(String(255), ForeignKey('users.id'), index=True)  # Corrected
     postId = Column(Integer, ForeignKey('posts.id'), index=True)  # Corrected
     voteType = Column(Integer, index=True)  # 1 for downvote, 0 for upvote
 

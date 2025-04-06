@@ -15,11 +15,7 @@ if not DATABASE_URL:
     raise ValueError("No DATABASE_URL set for SQLAlchemy database")
 
 # Create the SQLAlchemy engine
-engine = create_engine(DATABASE_URL, echo=True)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-
-# Create a configured "Session" class
+engine = create_engine(DATABASE_URL, echo=True, pool_pre_ping=True, pool_recycle=3600)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Create a base class for declarative class definitions

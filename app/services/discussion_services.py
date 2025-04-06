@@ -11,7 +11,7 @@ DOT_NET_API = os.getenv("ASPNET_API_URL")
 
 async def create_discussion_asp(discussion: dict, db) -> dict:
     async with httpx.AsyncClient as client:
-        response = await client.post(f"{DOT_NET_API}/Discussion", data=discussion)
+        response = await client.post(f"{DOT_NET_API}/Discussion", json=discussion)
         if response.status_code == 200:
             discussion["id"] = response.json().get("id")
             create_discussion_to_db(discussion, db)
@@ -21,18 +21,25 @@ async def create_discussion_asp(discussion: dict, db) -> dict:
 async def create_discussions_asp(discussions: List[Discussion], db) -> List[Discussion]:
     list_discussions = []
     for discussion in discussions:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(verify=False) as client:
             random_user = get_random_user(db)
             discussion.OwnerId = random_user.id
             response = await client.post(f"{DOT_NET_API}/Discussion",
-                                         json=discussion,
-                                         headers={"Authorization": f"Bearer {random_user.token}"})
-            if response.status_code == 200:
-                discussion.id= response.json().get("id")
-                create_discussion_to_db(discussion, db)
-                list_discussions.append(discussion)
+                                         headers={
+                                             "Content-Type": "application/json"},
+                                         json={
+                                              "d_Name": discussion.d_Name,
+                                              "d_Description": discussion.d_Description,
+                                              "d_Profile": discussion.d_Profile,
+                                              "ownerId": discussion.OwnerId
+                                        })
+            if response.status_code in (200, 201):
+                data_json = response.json()
+                discussion.id= data_json["id"]
             else:
                 raise HTTPException(status_code=response.status_code, detail=response.text)
+        create_discussion_to_db(discussion, db)
+        list_discussions.append(discussion)
     return list_discussions
 
 async def get_all_discussions_asp(db) -> List[Discussion]:

@@ -6,6 +6,7 @@ from app.CRUD.user_crud import get_user_by_id
 
 def create_joining_to_db(joining_data: dict, db: Session) -> None:
     db_joining = Joining(
+        id=joining_data["id"],
         userId=joining_data["userId"],
         discussionId=joining_data["discussionId"]
     )

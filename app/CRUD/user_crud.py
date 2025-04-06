@@ -5,10 +5,11 @@ import random
 
 def add_user_to_db(user_data: dict, db: Session) -> None:
     db_user = User(
+        id=user_data["id"],
         userName=user_data["userName"],
         firstName=user_data["firstName"],
-        lastName=user_data["firstName"],
-        email=user_data["firstName"],
+        lastName=user_data["lastName"],
+        email=user_data["email"],
         password=user_data["password"],
         token=user_data["token"]
         )

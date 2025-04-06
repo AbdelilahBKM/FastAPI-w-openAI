@@ -1,4 +1,4 @@
-from openai import OpenAI
+from openai import AsyncOpenAI
 from dotenv import load_dotenv
 import os
 
@@ -7,7 +7,7 @@ load_dotenv()
 ASP_NET_API = os.getenv("ASPNET_API_URL")
 OPENAI_API_KEY = os.getenv("GITHUB_TOKEN")
 
-client = OpenAI(
+client = AsyncOpenAI(
         base_url = "https://models.inference.ai.azure.com",
         api_key = OPENAI_API_KEY,
     )
@@ -44,20 +44,20 @@ async def generate_discussion_question(discussion_name: str) -> dict:
             After the title, separate it from the content using the delimiter ':0'.
             """
         }],
-        model="gpt-4",
+        model="gpt-4o",
         temperature=1,
         max_tokens=4096,
         top_p=1
     )
 
     # Extracting the content of the message
-    results = response.choices[0].message['content'].strip()
+    results = response.choices[0].message.content
 
     # Separate title and content using the delimiter ":0"
     delimiter = ":0"
     title, content = results.split(delimiter, 1)
 
-    post = {"Title": title.strip(), "Content": content.strip()}
+    post = {"title": title.strip(), "content": content.strip()}
     return post
 
 async def generate_answer_to_question(question: dict) -> str:
@@ -81,11 +81,11 @@ async def generate_answer_to_question(question: dict) -> str:
             Only output the answer content (no title, no labels, no formatting).
             """
         }],
-        model="gpt-4",
+        model="gpt-4o",
         temperature=1,
         max_tokens=4096,
         top_p=1
     )
 
-    return response.choices[0].message['content'].strip()
+    return response.choices[0].message.content.strip()
 
