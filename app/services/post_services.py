@@ -67,19 +67,34 @@ async def populate_all_discussions_with_posts(db) -> List[dict] | None:
         if questions is None:
             raise ValueError("Failed to create questions")
     return list_of_questions
+
+async def populate_all_discussions_with_answers(db) -> List[dict] | None:
+    discussions = get_local_discussions(db)
+    list_of_answers = []
+    if discussions is None:
+        raise ValueError("No discussions found")
+    for discussion in discussions:
+        print("Creating answers for discussion:", discussion.d_Name)
+        answers = await populate_discussion_with_answers(discussion, db)
+        list_of_answers.append({
+            "discussion": discussion.d_Name,
+            "answers": answers
+        })
+        if answers is None:
+            raise ValueError("Failed to create answers")
+    return list_of_answers
 ############################################################################################
 
 
-async def populate_discussion_with_answers(discussion_id: int, db) -> None:
-    discussion = get_discussion_by_id(discussion_id, db)
+async def populate_discussion_with_answers(discussion, db) -> List[dict] | None:
     answers = []
     if discussion is None:
         raise ValueError("Discussion not found")
-    questions = get_questions_by_discussion_id(discussion_id=discussion_id, db=db)
+    questions = get_questions_by_discussion_id(discussion_id=discussion.id, db=db)
     for question in questions:
-        for i in range(random.randint(2, 10)):
+        for i in range(random.randint(2, 7)):
             print("Creating post number", i + 1)
-            owner = get_random_user_by_discussion_id(discussion_id, db)
+            owner = get_random_user_by_discussion_id(discussion.id, db)
             if owner is None:
                 raise ValueError("No user found for the discussion")
             answer = await generate_answer_to_question({
@@ -88,7 +103,7 @@ async def populate_discussion_with_answers(discussion_id: int, db) -> None:
             })
             if answer is None:
                 raise ValueError("Failed to generate answer")
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(verify=False) as client:
                 answer_json = {
                   "title": "answer to question: " + question.title,
                   "content": answer,
@@ -99,13 +114,15 @@ async def populate_discussion_with_answers(discussion_id: int, db) -> None:
                 response = await client.post(
                     f"{DOT_NET_API}/Post",
                     headers={
-                        "Content-Type": "application/json",
-                        "Authorization": f"Bearer {owner.token}"
+                        "Content-Type": "application/json"
                     },
-                    data=answer_json
+                    json=answer_json
                 )
-                if response.status_code == 200:
-                    answer = create_answer_to_db(answer_json, db)
-                    answers.append(answer)
+                if response.status_code in (200, 201):
+                    response_json = response.json()
+                    answer_json["id"] = response_json["id"]
+                    answers.append(answer_json)
                 else:
                     raise ValueError(f"Failed to create answer: {response.text}")
+
+    return answers

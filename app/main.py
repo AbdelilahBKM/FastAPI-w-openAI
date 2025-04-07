@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 from fastapi import Request
 
 from app.CRUD.discussion_crud import get_local_discussions
-from app.CRUD.joining_crud import get_all_joining, get_all_joining_by_discussion_id, get_all_joining_by_user_id
+from app.CRUD.joining_crud import (get_all_joining, get_all_joining_by_discussion_id,
+                                   get_all_joining_by_user_id)
 from app.database import SessionLocal
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -13,8 +14,8 @@ from app.services.joining_services import create_joining_to_discussions
 from app.services.openai_api import generate_gpt_response
 from app.services.user_services import generate_new_users, get_local_users
 from app.services.discussion_services import create_discussions_asp, create_discussion_asp
-from app.services.post_services import (populate_discussion_with_answers,
-                                        populate_all_discussions_with_posts)
+from app.services.post_services import (populate_all_discussions_with_posts,
+                                        populate_all_discussions_with_answers)
 from app.utils.functions import discussions
 
 def get_session_local():
@@ -152,10 +153,10 @@ async def create_questions_to_discussions(db: Session = Depends(get_session_loca
     except Exception as ex:
         return {"error": str(ex)}
 
-@app.post("/Post/answers/{discussion_id}")
-async def create_answers_to_discussions(discussion_id: int, db: Session = Depends(get_session_local)):
+@app.post("/Post/answers/generate")
+async def create_answers_to_discussions(db: Session = Depends(get_session_local)):
     try:
-        answers = await populate_discussion_with_answers(discussion_id, db)
-        return {"answers": answers}
+        answers = await populate_all_discussions_with_answers(db)
+        return answers
     except Exception as ex:
         return {"error": str(ex)}

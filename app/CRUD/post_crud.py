@@ -25,6 +25,7 @@ def get_answer_by_id(answer_id: int, db: Session) -> Post | None:
 
 def create_answer_to_db(answer_data: dict, db: Session) -> Post:
     db_answer = Post(
+        id=answer_data["id"],
         title=answer_data["title"],
         content=answer_data["content"],
         postedBy=answer_data["postedBy"],
