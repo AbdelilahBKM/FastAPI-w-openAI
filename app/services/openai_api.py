@@ -1,36 +1,48 @@
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI, OpenAI
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
+model = "openai/gpt-4.1"
 
 ASP_NET_API = os.getenv("ASPNET_API_URL")
 OPENAI_API_KEY = os.getenv("GITHUB_TOKEN")
+endpoint = "https://models.github.ai/inference"
+openai_model = "openai/gpt-4.1"
 
-client = AsyncOpenAI(
-        base_url = "https://models.inference.ai.azure.com",
+client = OpenAI(
+        base_url = endpoint,
         api_key = OPENAI_API_KEY,
     )
+
+asyncClient = AsyncOpenAI(
+        base_url = endpoint,
+        api_key = OPENAI_API_KEY,
+)
 
 def generate_gpt_response(prompt: str) -> str:
     response = client.chat.completions.create(
         messages=[
             {
+                "role": "system",
+                "content": "You are a helpful assistant.",
+            },
+            {
                 "role": "user",
                 "content": prompt,
             }
         ],
-        model="gpt-4o",
-        temperature=1,
-        max_tokens=4096,
-        top_p=1
+        temperature=1.0,
+        top_p=1.0,
+        model=openai_model
     )
+
     return response.choices[0].message.content
 
 
 
 async def generate_discussion_question(discussion_name: str) -> dict:
-    response = await client.chat.completions.create(
+    response = await asyncClient.chat.completions.create(
         messages=[{
             "role": "user",
             "content": f"""
@@ -44,7 +56,7 @@ async def generate_discussion_question(discussion_name: str) -> dict:
             After the title, separate it from the content using the delimiter ':0'.
             """
         }],
-        model="gpt-4o",
+        model=openai_model,
         temperature=1,
         max_tokens=4096,
         top_p=1
@@ -61,7 +73,7 @@ async def generate_discussion_question(discussion_name: str) -> dict:
     return post
 
 async def generate_answer_to_question(question: dict) -> str:
-    response = await client.chat.completions.create(
+    response = await asyncClient.chat.completions.create(
         messages=[{
             "role": "user",
             "content": f"""
@@ -81,7 +93,7 @@ async def generate_answer_to_question(question: dict) -> str:
             Only output the answer content (no title, no labels, no formatting).
             """
         }],
-        model="gpt-4o",
+        model=openai_model,
         temperature=1,
         max_tokens=4096,
         top_p=1

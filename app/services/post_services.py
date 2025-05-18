@@ -5,8 +5,8 @@ import os
 import random
 from dotenv import load_dotenv
 from app.CRUD.joining_crud import get_random_user_by_discussion_id
-from app.CRUD.post_crud import create_question_to_db, get_questions_by_discussion_id, create_answer_to_db
-from app.CRUD.discussion_crud import get_discussion_by_id, get_local_discussions
+from app.CRUD.post_crud import create_question_to_db, get_questions_by_discussion_id
+from app.CRUD.discussion_crud import get_local_discussions
 from app.models import Post
 from app.services.openai_api import generate_discussion_question, generate_answer_to_question
 
