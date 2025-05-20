@@ -1,6 +1,7 @@
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
-from pydantic import BaseModel, Field
+
+from app.utils.classes import Question
 
 model_name = 'cross-encoder/ms-marco-MiniLM-L6-v2'
 
@@ -9,15 +10,9 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSequenceClassification.from_pretrained(model_name)
 model.eval()
 
-class Question(BaseModel):
-    id: int = Field(..., alias="Id")
-    title: str = Field(..., alias="Title")
-    content: str = Field(..., alias="Content")
-    class Config:
-        allow_population_by_field_name = True
 
 def question_to_text(q: Question) -> str:
-    return q.title + " " + q.content
+    return q.title
 
 
 def score_similarity(question: Question, candidates: list[Question]) -> list[float]:
@@ -32,5 +27,6 @@ def score_similarity(question: Question, candidates: list[Question]) -> list[flo
     )
     with torch.no_grad():
         logits = model(**features).logits.squeeze(-1)
-    return logits.tolist()
+        probabilities = torch.sigmoid(logits)
+    return probabilities.tolist()
 
