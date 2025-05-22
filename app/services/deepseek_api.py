@@ -8,7 +8,7 @@ from app.utils.classes import Question
 
 endpoint = "https://models.github.ai/inference"
 model = "deepseek/DeepSeek-V3-0324"
-token = os.environ["GITHUB_TOKEN"]
+token = os.environ["DEEPSEEK_API_KEY"]
 
 client = ChatCompletionsClient(
     endpoint=endpoint,

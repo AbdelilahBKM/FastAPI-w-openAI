@@ -8,4 +8,4 @@ router = APIRouter()
 @router.post("/assist")
 async def get_ai_answer(question: Question):
     answer = await generate_answer_with_deepseek(question)
-    return {"answer": answer, "source": "AI"}
+    return {"answer": answer}

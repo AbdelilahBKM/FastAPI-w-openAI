@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from dotenv import load_dotenv
 from app.database import SessionLocal
 from sqlalchemy import text
-from app.routers import (openai_routes, user_routes,
+from app.routers import (deep_seek_routes, openai_routes, user_routes,
                          discussion_routes, joining_routes,
                          post_routes, cross_encoder_routes)
 load_dotenv()
@@ -25,3 +25,4 @@ app.include_router(discussion_routes.router, prefix="/discussions")
 app.include_router(joining_routes.router, prefix="/joining")
 app.include_router(post_routes.router, prefix="/post")
 app.include_router(cross_encoder_routes.router, prefix="/cross-encoder")
+app.include_router(deep_seek_routes.router, prefix="/assistant")
